@@ -30,6 +30,62 @@ def usage():
 	print "echo 'ABCDEFGHI' | ./bhpnet.py -t 192.168.11.12 -p 135"
 	sys.exit(0)
 
+def client_sender(buffer):
+	client=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+	try:
+		# Connect to our target host
+		client.connect((target,port))
+
+		if len(buffer):
+			client.send(buffer)
+
+		while True:
+			# Now wait for data back
+			recv_len=1
+			response=""
+
+			while recv_len:
+				data=client.recv(4096)
+				recv_len=len(data)
+				response+=data
+
+				if recv_len < 4096:
+					break
+
+			print response,
+
+			# Wait for more input
+			buffer=raw_input("")
+			buffer+="\n"
+
+			# Send it off
+			client.send(buffer)
+
+	except:
+		print "[*] Exception! Exiting."
+
+		# Tear down the connection
+		client.close()
+
+# Primary Server Loop
+def server_loop():
+	global target
+	# If no target is defined, we listen on all interfaces
+	if not len(target):
+		target="0.0.0.0"
+
+	server=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	server.bind((target, port))
+	server.listen(5)
+
+	while True:
+		client_socket, addr=server.accept()
+		# spin off a thread to handle our new client
+		client_thread=threading.Thread(target=client_handler,
+			args=(client_socket,))
+		client_thread.start()
+
 def main():
 	global listen
 	global port
@@ -79,6 +135,7 @@ def main():
 	# drop a shell depending on commands above 
 	if listen:
 		server_loop()
+
 
 main()
 
