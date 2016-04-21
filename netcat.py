@@ -86,6 +86,20 @@ def server_loop():
 			args=(client_socket,))
 		client_thread.start()
 
+# Runs OS commands native to system
+def run_command(command):
+	# Trim the newline
+	command=command.rstrip()
+	
+	# Run the command and get the output
+	try:
+		output=subprocess.check_output(command,stderr=subprocess.STDOUT,shell=True)
+	except:
+		output="Failed to execute command.\r\n"
+	# Send the output back to the client
+	return output
+
+
 def main():
 	global listen
 	global port
