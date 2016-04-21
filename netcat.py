@@ -17,10 +17,10 @@ def usage():
 	print "BHP Net Tool"
 	print
 	print "Usage: bhpnet.py -t target_host -p port"
-	print "-l --listen				-listen on [host]:[port] for incoming connections"
+	print "-l --listen              -listen on [host]:[port] for incoming connections"
 	print "-e --execute=file_to_run -execute the given file upon receiving a connection"
-	print "-c --command				-initialize a command shell"
-	print "-u --upload=destination 	-upon receiving connection upload a file and write to [destination]"
+	print "-c --command             -initialize a command shell"
+	print "-u --upload=destination  -upon receiving connection upload a file and write to [destination]"
 	print
 	print
 	print "Examples: "
@@ -59,5 +59,28 @@ def main():
 			command=True
 		elif o in ("-u","--upload"):
 			upload_destination=a
-	#--------------------START AT PAGE 15---------------
+		elif o in ("-t", "--target"):
+			target=a
+		elif o in ("-p", "--port"):
+			port=int(a)
+		else:
+			assert False, "Unhandled Option"
+
+	# Choose to listen or send data from stdin...
+	if not listen and len(target) and port > 0:
+		# Read in buffer from command line
+		# This will block so press CTRL-D if not sending input to stdin
+		buffer=sys.stdin.read()
+
+		# send data off
+		client_sender(buffer)
+
+	# Here we listen and potentially upload stuff, execute commands and
+	# drop a shell depending on commands above 
+	if listen:
+		server_loop()
+
+main()
+
+
 	
