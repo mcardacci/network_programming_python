@@ -92,10 +92,44 @@ def proxy_handler(client_socket, remote_host, remote_port, receive_first):
             print "[*] No more data. Closing connections"
             break
 
+# 'receive_from' takes a socket object and performs the receive, dumping the contents of the packet
 def receive_from(connection):
-#==========START HERE===============================
+    buffer = ''
+    connection.settimeout(2)
+    try:
+        while True:
+            data = connection.recv(4096)
+            if not data:
+                break
+            buffer += data
+    except:
+        pass
+    return buffer
 
+# 'request_handler' function is used to modify the packet contents from the inbound traffic (i.e. perform fuzzing, test for authentication, etc.) 
+def request_handler(buffer):
+    # perform packet modifications
+    buffer += ' Yaeah!'
+    return buffer
 
+# 'response_handler does the same thing as 'request_handler' but for outbound traffic
+def response_handler(buffer):
+    # perform packet modifications
+    return buffer
+
+# 'hexdump' outputs the packet details with hexadecimal and ASCII characters
+def hexdump(src, length=16):
+    result = []
+    digits = 4 if isinstance(src, unicode) else 2
+    for i in range(len(src), length):
+        s = src[i:i+length]
+        hexa = b' '.join(['%0*X' % (digits, ord(x)) for x in s])
+        text = b''.join([x if 0x20 <= ord(x) < 0x7f else b'.' for x in s])
+        result.append(b"%04X %-*s %s" % (i, length*(digits + 1), hexa, text))
+    
+    print b'\n'.join(result)
+    
+main()
 
 
 
