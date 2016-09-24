@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import sys
 import socket
 import threading
@@ -5,9 +6,9 @@ import threading
 def main():
     # command line args handling
     if len(sys.argv[1:]) != 5:
-        print "Usage: ./proxy.py [localhost] [localport] [remotehost] [remoteport] [receive_first]"
-        print "Example: ./proxy.py 127.0.0.1 9000 10.12.132.1 9000 True"
-        sys.exit()
+        print "Usage: ./tcp_proxy.py [localhost] [localport] [remotehost] [remoteport] [receive_first]"
+        print "Example: ./tcp_proxy.py 127.0.0.1 9000 10.12.132.1 9000 True"
+        sys.exit(0)
 
     local_host = sys.argv[1]
     local_port = int(sys.argv[2])
@@ -31,12 +32,12 @@ def server_loop(local_host,local_port, remote_host, remote_port, receive_first):
     except:
         print "[!!] Failed to liston on %s:%d" % (local_host, local_port)
         print "[!!] Check for other listening sockets or correct permissions."
-        sys.exit()
+        sys.exit(0)
 
     print"[*] Listening on %s:%d" % (local_host, local_port)
     server.listen(5)
 
-    while 1:
+    while True:
         client_socket, addr = server.accept()
 
         # print out the local connection inform
